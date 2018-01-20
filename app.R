@@ -84,7 +84,7 @@ server <- function(input, output) {
   })
   
   # set up the first output plot
-  output$theFirstPlot <- renderPlot({
+  output$theSecondPlot <- renderPlot({
     
     crimeDataFilt <- crimeData %>%
       rename("violent_sum" = "violent_crime") %>%
@@ -122,7 +122,7 @@ server <- function(input, output) {
 
   })
   
-  output$theSecondPlot <- renderPlot({
+  output$theFirstPlot <- renderPlot({
     crimeDataFilt <- crimeData %>%
       rename("violent_sum" = "violent_crime")
     
