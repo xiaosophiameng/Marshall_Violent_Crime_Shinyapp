@@ -63,6 +63,8 @@ ui <- fluidPage( # Application title
     ))
 )
 
+#set up server
+
 server <- function(input, output) {
   
   # set up the output table
@@ -130,9 +132,12 @@ server <- function(input, output) {
   # set up the first plot
   output$theFirstPlot <- renderPlot({
     crimeData3 <- crimeData2 %>%
-      rename("violent_sum" = "violent_crime")
+      rename("violent_sum" = "violent_crime") %>% 
+      filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2]))
+      
+    
     crimeData3 %>%
-      filter(violent_sum < 1e6) %>%
+      filter(violent_sum < 1e5) %>%
       group_by(department_name) %>%
       ggplot(aes(year, violent_sum, color = department_name)) +
       geom_path() +
@@ -140,6 +145,7 @@ server <- function(input, output) {
 
     
   })
+  
   
 }
 
