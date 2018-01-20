@@ -41,13 +41,8 @@ ui <- fluidPage( # Application title
                              value = c(2000,2010)),
                  radioButtons("geom", "Geom", 
                               choices = c("Point" = "geom_point",
-                                          "Line" = "geom_line",
-                                          "Bar" = "geom_bar"), 
+                                          "Smooth" = "geom_smooth"), 
                               selected = "geom_point"),
-                 colourInput('pointColor', 'Point Color', value = '#000'),
-                 numericInput("alpha", "Transparency",
-                              min = 0, max = 1,
-                              value = 0.5, step = 0.1),
                  textInput("title", "Plot Title", value = "Crime Data vs Year")
     ),
     
@@ -62,8 +57,9 @@ ui <- fluidPage( # Application title
 
 server <- function(input, output) {
   
+  # set up the output table
   output$checkboxValue <- renderTable({
-    crimeDataFilt <- crimeData2 %>%
+    crimeData3 <- crimeData2 %>%
       rename("violent_sum" = "violent_crime") %>%
       filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) %>%
       filter(department_name %in% input$department_name) 
@@ -81,10 +77,41 @@ server <- function(input, output) {
       columns <- c(columns, paste0(col, '_sum'), paste0(col, '_per_100k'))
     }
     
-    crimeDataFilt[, c('year', columns)]
+    crimeData3[, c('year', columns)]
   })
   
+  # set up the first output plot
+  output$theFirstPlot <- renderPlot({
+    
+    crimeDataFilt <- crimeData %>%
+      rename("violent_sum" = "violent_crime") %>%
+      filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) %>%
+      filter(department_name %in% input$department_name) 
+    
+    crimeDataCountPlot <- ggplot(crimeDataFilt)
+    colors <- c('red', 'blue', 'green', 'yellow', 'cyan')
+    for (ict in 1:length(input$crime_type)) {
+      col <- strsplit(input$crime_type[ict], '_')
+      
+      if (length(col[[1]]) <= 2) {
+        col <- col[[1]][1]
+      } else {
+        col <- paste0(col[[1]][1], '_', col[[1]][2])
+      }
+      y <- paste0(col, '_sum')
+      title <- paste0('Count of ', col, ' crime')
+      
+      crimeDataCountPlot <- crimeDataCountPlot + geom_smooth(aes_string('year', y, color = shQuote(y)))
 
+    }
+    
+    crimeDataCountPlot + scale_color_manual("crime type", values=c(violent_sum=colors[1],
+                                                                   homs_sum=colors[2],
+                                                                   rape_sum=colors[3],
+                                                                   rob_sum=colors[4],
+                                                                   agg_ass_sum=colors[5]))
+
+  })
   
 }
 
