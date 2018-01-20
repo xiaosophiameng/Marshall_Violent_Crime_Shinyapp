@@ -6,6 +6,7 @@ library(dplyr)
 library(magrittr)
 library(colourpicker)
 library(lubridate)
+library(plotly)
 
 # read data and initial data wrangling
 
@@ -34,7 +35,8 @@ ui <- fluidPage( # Application title
                                                 "Robbery" = "rob_sum",
                                                 "Aggravated Assault" = "agg_ass_sum"),
                                     selected = "violent_crime"),
-                 selectInput("department_name", "Select Regions:", choices = as.character(crimeData2$department_name), selected = crimeData2$department_name[1]),
+                 selectInput("department_name", "Region in interest:", 
+                             choices = as.character(crimeData2$department_name), selected = crimeData2$department_name[1]),
 
                  sliderInput("year", "Select Years:",
                              min = 1975, max = 2015,
@@ -51,9 +53,16 @@ ui <- fluidPage( # Application title
     
     # Show a plot of the generated distribution
     mainPanel(
-      
       h4('Violent Crime Rate of Selected Region vs All'),
-      plotOutput("theFirstPlot"),
+      fluidRow(splitLayout(cellWidths = c("50%", "50%"),
+                           plotOutput("theFirstPlot"), plotOutput("theThirdPlot"))),
+                
+      
+      #h4('Violent Crime Rate of Selected Region vs All'),
+      #plotOutput("theFirstPlot"),
+      
+      #h4('lala'),
+      #plotOutput("theThirdPlot"),
       
       h4('Crime Rate of Selected Region'),
       plotOutput("theSecondPlot"),
@@ -143,18 +152,21 @@ server <- function(input, output) {
     
 
     #plot all and deffrenciate the selected region
-    p2 <-
+    
+
+    
+    plot2 <-
       ggplot(crimeData3, aes(year,violent_per_100k)) +
       geom_path(aes(group=department_name, colour=department_name==input$department_name),
                 se=FALSE,size=0.4)+
       scale_colour_manual("",
                           labels=c("other",input$department_name),
-                          values = c("Grey","Red")
+                          values = c("Grey","Red","blue")
                           )
 
 
       
-      p2
+      plot2
 
     
   })
