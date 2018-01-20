@@ -60,9 +60,6 @@ ui <- fluidPage( # Application title
       h4('Violent Crime Rate of Selected Region vs All'),
       plotlyOutput("theFirstPlot"),
       
-      #h4('lala'),
-      #plotOutput("theThirdPlot"),
-      
       h4('Crime Rate of Selected Region'),
       plotOutput("theSecondPlot"),
       
@@ -83,11 +80,6 @@ server <- function(input, output) {
       filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) 
     
     
-    crimeData4 <- crimeData3 %>%
-      filter(violent_sum < 1e5) %>%
-      group_by(department_name) 
-    
-    
     #plot all and deffrenciate the selected region
     
     
@@ -96,11 +88,11 @@ server <- function(input, output) {
       ggplot(crimeData3, aes(year,violent_per_100k,,text=(department_name))) +
       geom_path(aes(group=department_name, colour=department_name==input$department_name),
                 se=FALSE,size=0.4)+
+      theme(legend.position="bottom")+
       scale_colour_manual("",
                           labels=c("other",input$department_name),
                           values = c("Grey","Red")
-      )+
-      theme(legend.position="bottom")
+      )
     
     
     
@@ -134,7 +126,7 @@ server <- function(input, output) {
       } else {
         col <- paste0(col[[1]][1], '_', col[[1]][2])
       }
-      y <- paste0(col, '_per_100k')
+      y <- paste0(col, '_per_100k') #output crime rates
       title <- paste0('Rate of ', col, ' crime')
       
 
@@ -158,7 +150,7 @@ server <- function(input, output) {
   output$checkboxValue <- renderTable({
     crimeData3 <- crimeData2 %>%
       rename("violent_sum" = "violent_crime") %>%
-      filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) %>%
+      filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) %>% # according to the slected years
       filter(department_name %in% input$department_name) 
     
     
@@ -171,7 +163,7 @@ server <- function(input, output) {
       } else {
         col <- paste0(col[[1]][1], '_', col[[1]][2])
       }
-      columns <- c(columns, paste0(col, '_sum'), paste0(col, '_per_100k'))
+      columns <- c(columns, paste0(col, '_sum'), paste0(col, '_per_100k')) #output both crime counts and crime rates
     }
     
     crimeData3[, c('year', columns)]
