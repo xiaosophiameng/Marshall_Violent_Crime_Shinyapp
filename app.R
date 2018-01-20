@@ -36,7 +36,7 @@ ui <- fluidPage( # Application title
                                                 "Aggravated Assault" = "agg_ass_sum"),
                                     selected = "violent_crime"),
                  selectInput("department_name", "Region in interest:", 
-                             choices = as.character(crimeData2$department_name), selected = crimeData2$department_name[[1]]),
+                             choices = as.character(crimeData2$department_name), selected = "Chicago"),
 
                  sliderInput("year", "Select Years:",
                              min = 1975, max = 2015,
@@ -47,19 +47,18 @@ ui <- fluidPage( # Application title
                               selected = "geom_point"),
                  numericInput("alpha", "Transparency",
                               min = 0, max = 1,
-                              value = 0.5, step = 0.1),
-                 textInput("title", "Plot Title", value = "Crime Data vs Year")
+                              value = 0.5, step = 0.1)
     ),
     
     # Show a plot of the generated distribution
     mainPanel(
-      h4('Violent Crime Rate of Selected Region vs All'),
-      fluidRow(splitLayout(cellWidths = c("50%", "50%"),
-                           plotOutput("theFirstPlot"), plotlyOutput("theThirdPlot"))),
+      #h4('Violent Crime Rate of Selected Region vs All'),
+      #fluidRow(splitLayout(cellWidths = c("50%", "50%"),
+                           #plotlyOutput("theFirstPlot"), plotlyOutput("theThirdPlot"))),
                 
       
-      #h4('Violent Crime Rate of Selected Region vs All'),
-      #plotOutput("theFirstPlot"),
+      h4('Violent Crime Rate of Selected Region vs All'),
+      plotlyOutput("theFirstPlot"),
       
       #h4('lala'),
       #plotOutput("theThirdPlot"),
@@ -76,27 +75,40 @@ ui <- fluidPage( # Application title
 
 server <- function(input, output) {
   
-  # set up the output table
-  output$checkboxValue <- renderTable({
+  # set up the first plot
+  output$theFirstPlot <- renderPlotly({
+    
     crimeData3 <- crimeData2 %>%
-      rename("violent_sum" = "violent_crime") %>%
-      filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) %>%
-      filter(department_name %in% input$department_name) 
+      rename("violent_sum" = "violent_crime") %>% 
+      filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) 
     
     
-    columns <- c()
+    crimeData4 <- crimeData3 %>%
+      filter(violent_sum < 1e5) %>%
+      group_by(department_name) 
     
-    for (ict in 1:length(input$crime_type)) {
-      col <- strsplit(input$crime_type[ict], '_')
-      if (length(col[[1]]) <= 2) {
-        col <- col[[1]][1]
-      } else {
-        col <- paste0(col[[1]][1], '_', col[[1]][2])
-      }
-      columns <- c(columns, paste0(col, '_sum'), paste0(col, '_per_100k'))
-    }
     
-    crimeData3[, c('year', columns)]
+    #plot all and deffrenciate the selected region
+    
+    
+    
+    plot2 <-
+      ggplot(crimeData3, aes(year,violent_per_100k,,text=(department_name))) +
+      geom_path(aes(group=department_name, colour=department_name==input$department_name),
+                se=FALSE,size=0.4)+
+      scale_colour_manual("",
+                          labels=c("other",input$department_name),
+                          values = c("Grey","Red")
+      )+
+      theme(legend.position="bottom")
+    
+    
+    
+    plot3 <- ggplotly(plot2,tooltip=c("x","text")) 
+    
+    
+    plot3
+    
   })
   
   # set up the second output plot
@@ -141,59 +153,29 @@ server <- function(input, output) {
                                                                    rob_per_100k=colors[4],
                                                                    agg_ass_per_100k=colors[5]))
   })
-  
-  # set up the third output plot
-  output$theThirdPlot <- renderPlotly({
-    
-    
-    crimeData3 <- crimeData2 %>%
-      rename("violent_sum" = "violent_crime") %>% 
-      filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) 
  
-
-
-   
-   p <-
-     plot_ly(crimeData3, x = ~year, y = ~violent_per_100k) %>%
-     add_lines(color = ~department_name, colors = "black", alpha = 0.2) %>% 
-     layout(showlegend = FALSE)
-     
-   p
-  })
-  
-  # set up the first plot
-  output$theFirstPlot <- renderPlot({
-
+  # set up the output table
+  output$checkboxValue <- renderTable({
     crimeData3 <- crimeData2 %>%
-      rename("violent_sum" = "violent_crime") %>% 
-      filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) 
+      rename("violent_sum" = "violent_crime") %>%
+      filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) %>%
+      filter(department_name %in% input$department_name) 
     
     
-    crimeData4 <- crimeData3 %>%
-      filter(violent_sum < 1e5) %>%
-      group_by(department_name) 
+    columns <- c()
     
-
-    #plot all and deffrenciate the selected region
+    for (ict in 1:length(input$crime_type)) {
+      col <- strsplit(input$crime_type[ict], '_')
+      if (length(col[[1]]) <= 2) {
+        col <- col[[1]][1]
+      } else {
+        col <- paste0(col[[1]][1], '_', col[[1]][2])
+      }
+      columns <- c(columns, paste0(col, '_sum'), paste0(col, '_per_100k'))
+    }
     
-
-    
-    plot2 <-
-      ggplot(crimeData3, aes(year,violent_per_100k)) +
-      geom_path(aes(group=department_name, colour=department_name==input$department_name),
-                se=FALSE,size=0.4)+
-      scale_colour_manual("",
-                          labels=c("other",input$department_name),
-                          values = c("Grey","Red")
-                          )
-
-
-      
-      plot2
-
-    
-  })
-  
+    crimeData3[, c('year', columns)]
+  })   
   
 }
 
