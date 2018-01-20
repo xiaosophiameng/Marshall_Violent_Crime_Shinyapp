@@ -21,13 +21,50 @@ crimeData2 <-
 ui <- fluidPage(
    
    # Application title
+  titlePanel(title = "Marshall Violent Crime Analysis"),
    
    
    # Sidebar with a slider input for number of bins 
-
+  sidebarLayout(
+    sidebarPanel(width = 3,
+                 "Welcome to an exploration of Marshall Violent Crime data",
+                 hr(),
+                 checkboxGroupInput("crime_type",
+                                    "Crime Type",
+                                    choices = c("Total Violent" = "sum_violent",
+                                                "Homicide" = "homs_sum",
+                                                "Rape" = "rape_sum",
+                                                "Robbery" = "rob_sum",
+                                                "Aggravated Assault" = "agg_ass_sum"),
+                                    selected = "violent_crime"),
+                 selectInput("department_name", "Select Regions:", choices = crimeData2$department_name),
+                 sliderInput("year", "Select Years:",
+                             min = 1975, max = 2015,
+                             value = c(2000,2010)),
+                 radioButtons("geom", "Geom", 
+                              choices = c("Point" = "geom_point",
+                                          "Line" = "geom_line",
+                                          "Bar" = "geom_bar"), 
+                              selected = "geom_point"),
+                 textInput("title", "Plot Title", value = "Crime Data vs Year")
+    ),
       
       # Show a plot of the generated distribution
+    mainPanel(#width = 5,
+      # fluidRow(
+      #   column(6,
+      #          plotOutput("theFirstPlot")),
+      #   column(6,
+      #          plotOutput("theSecondPlot"))
+      # ),
+      
+      plotOutput("theFirstPlot"),
+      
+      plotOutput("theSecondPlot"),
+      tableOutput("checkboxValue")
+    ))
 )
+
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
