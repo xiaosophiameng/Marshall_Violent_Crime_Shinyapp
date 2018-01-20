@@ -50,14 +50,7 @@ ui <- fluidPage(
     ),
       
       # Show a plot of the generated distribution
-    mainPanel(#width = 5,
-      # fluidRow(
-      #   column(6,
-      #          plotOutput("theFirstPlot")),
-      #   column(6,
-      #          plotOutput("theSecondPlot"))
-      # ),
-      
+    mainPanel(
       plotOutput("theFirstPlot"),
       
       plotOutput("theSecondPlot"),
@@ -68,8 +61,7 @@ ui <- fluidPage(
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-   
-   
+  
 }
 
 # Run the application 
