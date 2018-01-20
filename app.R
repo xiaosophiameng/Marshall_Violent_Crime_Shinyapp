@@ -141,13 +141,8 @@ server <- function(input, output) {
       filter(violent_sum < 1e5) %>%
       group_by(department_name) 
     
-    #p1 <-
-      #ggplot(crimeData4,aes(year, violent_per_100k, color = department_name)) +
-      #geom_smooth(se=FALSE,alpha = input$alpha) +
-      #theme(legend.position = 'none')
 
-    #p1
-
+    #plot all and deffrenciate the selected region
     p2 <-
       ggplot(crimeData3, aes(year,violent_per_100k)) +
       geom_path(aes(group=department_name, colour=department_name==input$department_name),
