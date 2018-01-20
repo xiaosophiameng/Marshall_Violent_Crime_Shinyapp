@@ -62,6 +62,14 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
   
+  #set up the output table
+  output$checkboxValue <- renderTable({
+    crimeData3 <- 
+      crimeData2 %>%
+      filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) %>%
+      filter(department_name %in% input$department_name) 
+  }
+)
 }
 
 # Run the application 
