@@ -34,7 +34,7 @@ ui <- fluidPage( # Application title
                                                 "Robbery" = "rob_sum",
                                                 "Aggravated Assault" = "agg_ass_sum"),
                                     selected = "violent_crime"),
-                 selectInput("department_name", "Select Regions:", choices = crimeData$department_name, selected = "Chicago"),
+                 selectInput("department_name", "Select Regions:", choices = crimeData2$department_name, selected = "Chicago"),
 
                  sliderInput("year", "Select Years:",
                              min = 1975, max = 2015,
@@ -51,9 +51,14 @@ ui <- fluidPage( # Application title
     
     # Show a plot of the generated distribution
     mainPanel(
+      
+      h4('Selected Region vs All'),
       plotOutput("theFirstPlot"),
       
+      h4('Crime Rate of Selected Region'),
       plotOutput("theSecondPlot"),
+      
+      h4('Crime Details of Selected Region'),
       tableOutput("checkboxValue")
     ))
 )
@@ -83,15 +88,16 @@ server <- function(input, output) {
     crimeData3[, c('year', columns)]
   })
   
-  # set up the first output plot
+  # set up the second output plot
   output$theSecondPlot <- renderPlot({
     
-    crimeDataFilt <- crimeData %>%
+    crimeData3 <- crimeData2 %>%
       rename("violent_sum" = "violent_crime") %>%
       filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) %>%
       filter(department_name %in% input$department_name) 
+
     
-    crimeDataCountPlot <- ggplot(crimeDataFilt)
+    crimeDataCountPlot <- ggplot(crimeData3)
     colors <- c('red', 'blue', 'green', 'yellow', 'cyan')
     for (ict in 1:length(input$crime_type)) {
       col <- strsplit(input$crime_type[ict], '_')
@@ -119,16 +125,13 @@ server <- function(input, output) {
                                                                    rape_sum=colors[3],
                                                                    rob_sum=colors[4],
                                                                    agg_ass_sum=colors[5]))
-
   })
   
+  # set up the first plot
   output$theFirstPlot <- renderPlot({
-    crimeDataFilt <- crimeData %>%
+    crimeData3 <- crimeData2 %>%
       rename("violent_sum" = "violent_crime")
-    
-    cities <- as.character(crimeDataFilt$department_name[1:10])
-    print(cities)
-    crimeDataFilt %>%
+    crimeData3 %>%
       filter(violent_sum < 1e6) %>%
       group_by(department_name) %>%
       ggplot(aes(year, violent_sum, color = department_name)) +
