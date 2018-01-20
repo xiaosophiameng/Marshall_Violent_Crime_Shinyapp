@@ -43,6 +43,9 @@ ui <- fluidPage( # Application title
                               choices = c("Point" = "geom_point",
                                           "Smooth" = "geom_smooth"), 
                               selected = "geom_point"),
+                 numericInput("alpha", "Transparency",
+                              min = 0, max = 1,
+                              value = 0.5, step = 0.1),
                  textInput("title", "Plot Title", value = "Crime Data vs Year")
     ),
     
@@ -101,7 +104,13 @@ server <- function(input, output) {
       y <- paste0(col, '_sum')
       title <- paste0('Count of ', col, ' crime')
       
-      crimeDataCountPlot <- crimeDataCountPlot + geom_smooth(aes_string('year', y, color = shQuote(y)))
+
+      if(input$geom == "geom_point"){
+        crimeDataCountPlot <- crimeDataCountPlot + geom_point(aes_string('year', y, color = shQuote(y)),size = 2, alpha = input$alpha)
+      }else if (input$geom == "geom_smooth"){
+        crimeDataCountPlot <- crimeDataCountPlot + geom_smooth(aes_string('year', y, color = shQuote(y)),size = 2, alpha = input$alpha)
+        }
+      
 
     }
     
