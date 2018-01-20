@@ -122,6 +122,22 @@ server <- function(input, output) {
 
   })
   
+  output$theSecondPlot <- renderPlot({
+    crimeDataFilt <- crimeData %>%
+      rename("violent_sum" = "violent_crime")
+    
+    cities <- as.character(crimeDataFilt$department_name[1:10])
+    print(cities)
+    crimeDataFilt %>%
+      filter(violent_sum < 1e6) %>%
+      group_by(department_name) %>%
+      ggplot(aes(year, violent_sum, color = department_name)) +
+      geom_path() +
+      theme(legend.position = 'none')
+
+    
+  })
+  
 }
 
 shinyApp(ui = ui, server = server)
