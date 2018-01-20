@@ -9,7 +9,7 @@ library(lubridate)
 
 # read data and initial data wrangling
 
-crimeData <- read.csv("ucr_crime_1975_2015.csv")
+crimeData <- read_csv("ucr_crime_1975_2015.csv")
 
 crimeData2 <-
   crimeData %>% 
@@ -34,7 +34,7 @@ ui <- fluidPage( # Application title
                                                 "Robbery" = "rob_sum",
                                                 "Aggravated Assault" = "agg_ass_sum"),
                                     selected = "violent_crime"),
-                 selectInput("department_name", "Select Regions:", choices = crimeData2$department_name, selected = "Chicago"),
+                 selectInput("department_name", "Select Regions:", choices = as.character(crimeData2$department_name), selected = crimeData2$department_name[1]),
 
                  sliderInput("year", "Select Years:",
                              min = 1975, max = 2015,
@@ -52,7 +52,7 @@ ui <- fluidPage( # Application title
     # Show a plot of the generated distribution
     mainPanel(
       
-      h4('Selected Region vs All'),
+      h4('Violent Crime Rate of Selected Region vs All'),
       plotOutput("theFirstPlot"),
       
       h4('Crime Rate of Selected Region'),
@@ -109,8 +109,8 @@ server <- function(input, output) {
       } else {
         col <- paste0(col[[1]][1], '_', col[[1]][2])
       }
-      y <- paste0(col, '_sum')
-      title <- paste0('Count of ', col, ' crime')
+      y <- paste0(col, '_per_100k')
+      title <- paste0('Rate of ', col, ' crime')
       
 
       if(input$geom == "geom_point"){
@@ -122,26 +122,44 @@ server <- function(input, output) {
 
     }
     
-    crimeDataCountPlot + scale_color_manual("crime type", values=c(violent_sum=colors[1],
-                                                                   homs_sum=colors[2],
-                                                                   rape_sum=colors[3],
-                                                                   rob_sum=colors[4],
-                                                                   agg_ass_sum=colors[5]))
+    crimeDataCountPlot + scale_color_manual("crime type", values=c(violent_per_100k=colors[1],
+                                                                   homs_per_100k=colors[2],
+                                                                   rape_per_100k=colors[3],
+                                                                   rob_per_100k=colors[4],
+                                                                   agg_ass_per_100k=colors[5]))
   })
   
   # set up the first plot
   output$theFirstPlot <- renderPlot({
+
     crimeData3 <- crimeData2 %>%
       rename("violent_sum" = "violent_crime") %>% 
-      filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2]))
-      
+      filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) 
     
-    crimeData3 %>%
+    
+    crimeData4 <- crimeData3 %>%
       filter(violent_sum < 1e5) %>%
-      group_by(department_name) %>%
-      ggplot(aes(year, violent_sum, color = department_name)) +
-      geom_path() +
-      theme(legend.position = 'none')
+      group_by(department_name) 
+    
+    #p1 <-
+      #ggplot(crimeData4,aes(year, violent_per_100k, color = department_name)) +
+      #geom_smooth(se=FALSE,alpha = input$alpha) +
+      #theme(legend.position = 'none')
+
+    #p1
+
+    p2 <-
+      ggplot(crimeData3, aes(year,violent_per_100k)) +
+      geom_path(aes(group=department_name, colour=department_name==input$department_name),
+                se=FALSE,size=0.4)+
+      scale_colour_manual("",
+                          labels=c("other",input$department_name),
+                          values = c("Grey","Red")
+                          )
+
+
+      
+      p2
 
     
   })
