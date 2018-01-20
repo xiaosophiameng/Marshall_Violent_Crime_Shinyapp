@@ -102,6 +102,10 @@ server <- function(input, output) {
   # set up the second output plot
   output$theSecondPlot <- renderPlot({
     
+    if (is.null(input$department_name)){
+      return(NULL)
+    }
+    
     crimeData3 <- crimeData2 %>%
       rename("violent_sum" = "violent_crime") %>%
       filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) %>%
@@ -145,23 +149,16 @@ server <- function(input, output) {
     crimeData3 <- crimeData2 %>%
       rename("violent_sum" = "violent_crime") %>% 
       filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) 
-    
-    p <- plot_ly(
-      type = 'scatter',
-      x = crimeData3$year,
-      y = crimeData3$violent_per_100k,
-      text = paste("Region:", crimeData3$department_name),
-      hoverinfo = 'text',
-      mode = 'lines',
-      transforms = list(
-        list(
-          type = 'groupby',
-          groups = crimeData3$department_name
-          )
-      )
-    )
-    p
-    
+ 
+
+
+   
+   p <-
+     plot_ly(crimeData3, x = ~year, y = ~violent_per_100k) %>%
+     add_lines(color = ~department_name, colors = "black", alpha = 0.2) %>% 
+     layout(showlegend = FALSE)
+     
+   p
   })
   
   # set up the first plot
