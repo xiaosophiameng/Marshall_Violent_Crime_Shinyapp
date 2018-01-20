@@ -85,7 +85,7 @@ server <- function(input, output) {
     
     
     plot2 <-
-      ggplot(crimeData3, aes(year,violent_per_100k,,text=(department_name))) +
+      ggplot(crimeData3, aes(year,violent_per_100k,text=(department_name))) +
       geom_path(aes(group=department_name, colour=department_name==input$department_name),
                 se=FALSE,size=0.4)+
       theme(legend.position="bottom")+
