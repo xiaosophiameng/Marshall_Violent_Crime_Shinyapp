@@ -10,7 +10,7 @@ library(plotly)
 
 # read data and initial data wrangling
 
-crimeData <- read_csv("ucr_crime_1975_2015.csv")
+crimeData <- read.csv("ucr_crime_1975_2015.csv")
 
 crimeData2 <-
   crimeData %>% 
@@ -36,7 +36,7 @@ ui <- fluidPage( # Application title
                                                 "Aggravated Assault" = "agg_ass_sum"),
                                     selected = "violent_crime"),
                  selectInput("department_name", "Region in interest:", 
-                             choices = as.character(crimeData2$department_name), selected = crimeData2$department_name[1]),
+                             choices = as.character(crimeData2$department_name), selected = crimeData2$department_name[[1]]),
 
                  sliderInput("year", "Select Years:",
                              min = 1975, max = 2015,
@@ -55,7 +55,7 @@ ui <- fluidPage( # Application title
     mainPanel(
       h4('Violent Crime Rate of Selected Region vs All'),
       fluidRow(splitLayout(cellWidths = c("50%", "50%"),
-                           plotOutput("theFirstPlot"), plotOutput("theThirdPlot"))),
+                           plotOutput("theFirstPlot"), plotlyOutput("theThirdPlot"))),
                 
       
       #h4('Violent Crime Rate of Selected Region vs All'),
@@ -138,6 +138,32 @@ server <- function(input, output) {
                                                                    agg_ass_per_100k=colors[5]))
   })
   
+  # set up the third output plot
+  output$theThirdPlot <- renderPlotly({
+    
+    
+    crimeData3 <- crimeData2 %>%
+      rename("violent_sum" = "violent_crime") %>% 
+      filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) 
+    
+    p <- plot_ly(
+      type = 'scatter',
+      x = crimeData3$year,
+      y = crimeData3$violent_per_100k,
+      text = paste("Region:", crimeData3$department_name),
+      hoverinfo = 'text',
+      mode = 'lines',
+      transforms = list(
+        list(
+          type = 'groupby',
+          groups = crimeData3$department_name
+          )
+      )
+    )
+    p
+    
+  })
+  
   # set up the first plot
   output$theFirstPlot <- renderPlot({
 
@@ -161,7 +187,7 @@ server <- function(input, output) {
                 se=FALSE,size=0.4)+
       scale_colour_manual("",
                           labels=c("other",input$department_name),
-                          values = c("Grey","Red","blue")
+                          values = c("Grey","Red")
                           )
 
 
@@ -174,4 +200,5 @@ server <- function(input, output) {
   
 }
 
+#launch the app
 shinyApp(ui = ui, server = server)
