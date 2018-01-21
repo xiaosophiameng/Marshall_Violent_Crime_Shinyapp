@@ -91,11 +91,11 @@ server <- function(input, output) {
       ggplot(crimeData3, aes(year,violent_per_100k,text=(department_name))) +
       geom_path(aes(group=department_name, colour=department_name==input$department_name),
                 se=FALSE,size=0.4)+
-      theme(legend.position="bottom")+
       scale_colour_manual("",
                           labels=c("other",input$department_name),
                           values = c("Grey","Red")
-      )
+      )+
+      theme(legend.position = "none")
     
     
     
@@ -146,7 +146,9 @@ server <- function(input, output) {
                                                                    homs_per_100k=colors[2],
                                                                    rape_per_100k=colors[3],
                                                                    rob_per_100k=colors[4],
-                                                                   agg_ass_per_100k=colors[5]))
+                                                                   agg_ass_per_100k=colors[5]))+
+      theme(legend.position = "bottom")
+    
   })
  
   # set up the output table

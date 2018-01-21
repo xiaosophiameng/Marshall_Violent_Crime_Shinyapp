@@ -5,8 +5,8 @@ account: xiaosophiameng
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 258822
-bundleId: 1185700
+bundleId: 1185864
 url: https://xiaosophiameng.shinyapps.io/Sophiashinyapp/
-when: 1516555148.22807
+when: 1516564151.27297
 asMultiple: FALSE
 asStatic: FALSE
