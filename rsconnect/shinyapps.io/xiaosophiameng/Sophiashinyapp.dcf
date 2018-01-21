@@ -1,0 +1,12 @@
+name: Sophiashinyapp
+title: Sophiashinyapp
+username:
+account: xiaosophiameng
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 258822
+bundleId: 1185700
+url: https://xiaosophiameng.shinyapps.io/Sophiashinyapp/
+when: 1516555148.22807
+asMultiple: FALSE
+asStatic: FALSE
