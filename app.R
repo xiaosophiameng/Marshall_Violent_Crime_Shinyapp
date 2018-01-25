@@ -21,7 +21,8 @@ crimeData2 <-
 
 ui <- fluidPage( # Application title
   titlePanel(title = "Marshall Violent Crime Analysis"),
-  
+  tabsetPanel(
+    tabPanel("Viz",
   # Sidebar with a slider input for number of bins
   sidebarLayout(
     sidebarPanel(width = 3,
@@ -80,7 +81,18 @@ ui <- fluidPage( # Application title
       h4('Crime Rate of Selected Region'),
       plotOutput("theSecondPlot")
       
-    ))
+    ))),
+  tabPanel("Data",
+           mainPanel(
+             #h4('Violent Crime Rate of Selected Region vs All'),
+             #fluidRow(splitLayout(cellWidths = c("50%", "50%"),
+             #plotlyOutput("theFirstPlot"), plotlyOutput("theThirdPlot"))),
+             
+             
+             h4('Selected Region in All'),
+             plotlyOutput("theFirstPlot")))
+           
+)
 )
 
 #set up server
