@@ -27,8 +27,17 @@ ui <- fluidPage( # Application title
     sidebarPanel(width = 3,
                  "Welcome to an exploration of Marshall Violent Crime data",
                  hr(),
+                 radioButtons("crime_type_only_one",
+                              label = "Select Crime Type for the plot 1 *Selected Region in All*",
+                              choices = c("Total Violent" = "violent_crime",
+                                          "Homicide" = "homs_sum",
+                                          "Rape" = "rape_sum",
+                                          "Robbery" = "rob_sum",
+                                          "Aggravated Assault" = "agg_ass_sum"),
+                              selected = "violent_crime"),
+                 hr(),
                  checkboxGroupInput("crime_type",
-                                    "Crime Type",
+                                    "Select Crime Type(s) for detail analysis (multiple allowed)",
                                     choices = c("Total Violent" = "violent_crime",
                                                 "Homicide" = "homs_sum",
                                                 "Rape" = "rape_sum",
@@ -80,12 +89,13 @@ server <- function(input, output) {
     crimeData3 <- crimeData2 %>%
       #rename("violent_sum" = "violent_crime") %>% 
       filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) 
+      
     
     
     #plot all and deffrenciate the selected region
     
     
-    if (input$crime_type == "violent_crime"){
+    if (input$crime_type_only_one == "violent_crime"){
     plot2 <-
       ggplot(crimeData3, aes(year,violent_per_100k,text=(department_name))) +
       geom_path(aes(group=department_name, colour=department_name==input$department_name),
@@ -101,7 +111,7 @@ server <- function(input, output) {
     
     plot3 <- ggplotly(plot2,tooltip=c("x","text"))}
     
-    if (input$crime_type == "homs_sum"){
+    if (input$crime_type_only_one == "homs_sum"){
       plot2 <-
         ggplot(crimeData3, aes(year,homs_per_100k,text=(department_name))) +
         geom_path(aes(group=department_name, colour=department_name==input$department_name),
@@ -117,7 +127,7 @@ server <- function(input, output) {
       
       plot3 <- ggplotly(plot2,tooltip=c("x","text"))}    
 
-    if (input$crime_type == "rape_sum"){
+    if (input$crime_type_only_one == "rape_sum"){
       plot2 <-
         ggplot(crimeData3, aes(year,rape_per_100k,text=(department_name))) +
         geom_path(aes(group=department_name, colour=department_name==input$department_name),
@@ -133,7 +143,7 @@ server <- function(input, output) {
       
       plot3 <- ggplotly(plot2,tooltip=c("x","text"))}            
     
-    if (input$crime_type == "rob_sum"){
+    if (input$crime_type_only_one == "rob_sum"){
       plot2 <-
         ggplot(crimeData3, aes(year,rob_per_100k,text=(department_name))) +
         geom_path(aes(group=department_name, colour=department_name==input$department_name),
@@ -149,7 +159,7 @@ server <- function(input, output) {
       
       plot3 <- ggplotly(plot2,tooltip=c("x","text"))}      
     
-    if (input$crime_type == "agg_ass_sum"){
+    if (input$crime_type_only_one == "agg_ass_sum"){
       plot2 <-
         ggplot(crimeData3, aes(year,agg_ass_per_100k,text=(department_name))) +
         geom_path(aes(group=department_name, colour=department_name==input$department_name),
