@@ -197,9 +197,15 @@ server <- function(input, output) {
       
 
       if(input$geom == "geom_point"){
-        crimeDataCountPlot <- crimeDataCountPlot + geom_point(aes_string('year', y, color = shQuote(y)),size = 2, alpha = input$alpha)
+        crimeDataCountPlot <- 
+          crimeDataCountPlot + 
+          geom_point(aes_string('year', y, color = shQuote(y)),size = 2, alpha = input$alpha) +
+          facet_wrap(~ input$department_name)
       }else if (input$geom == "geom_smooth"){
-        crimeDataCountPlot <- crimeDataCountPlot + geom_smooth(aes_string('year', y, color = shQuote(y)),size = 2, alpha = input$alpha)
+        crimeDataCountPlot <- 
+          crimeDataCountPlot + 
+          geom_smooth(aes_string('year', y, color = shQuote(y)),size = 2, alpha = input$alpha)+
+          facet_wrap(~ input$department_name)
         }
       
 
