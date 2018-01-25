@@ -28,13 +28,17 @@ ui <- fluidPage( # Application title
                  "Welcome to an exploration of Marshall Violent Crime data",
                  hr(),
                  radioButtons("crime_type_only_one",
-                              label = "Select Crime Type for the plot 1 *Selected Region in All*",
+                              label = "Select Crime Type for plot 1 *Selected Region in All*",
                               choices = c("Total Violent" = "violent_crime",
                                           "Homicide" = "homs_sum",
                                           "Rape" = "rape_sum",
                                           "Robbery" = "rob_sum",
                                           "Aggravated Assault" = "agg_ass_sum"),
                               selected = "violent_crime"),
+                 hr(),
+                 selectInput("city", "Region chose for plot 1 *Selected Region in All*:", multiple = FALSE,
+                             #choices = unique(as.character(crimeData2$department_name)), 
+                             sort(unique(crimeData2$department_name)),selected = "Chicago"),
                  hr(),
                  checkboxGroupInput("crime_type",
                                     "Select Crime Type(s) for detail analysis (multiple allowed)",
@@ -98,10 +102,10 @@ server <- function(input, output) {
     if (input$crime_type_only_one == "violent_crime"){
     plot2 <-
       ggplot(crimeData3, aes(year,violent_per_100k,text=(department_name))) +
-      geom_path(aes(group=department_name, colour=department_name==input$department_name),
+      geom_path(aes(group=department_name, colour=department_name==input$city),
                 se=FALSE,size=0.4)+
       scale_colour_manual("",
-                          labels=c("other",input$department_name),
+                          labels=c("other",input$city),
                           values = c("Grey","Red")
       )+
       theme(legend.position = "none")+
@@ -114,10 +118,10 @@ server <- function(input, output) {
     if (input$crime_type_only_one == "homs_sum"){
       plot2 <-
         ggplot(crimeData3, aes(year,homs_per_100k,text=(department_name))) +
-        geom_path(aes(group=department_name, colour=department_name==input$department_name),
+        geom_path(aes(group=department_name, colour=department_name==input$city),
                   se=FALSE,size=0.4)+
         scale_colour_manual("",
-                            labels=c("other",input$department_name),
+                            labels=c("other",input$city),
                             values = c("Grey","Red")
         )+
         theme(legend.position = "none")+
@@ -130,10 +134,10 @@ server <- function(input, output) {
     if (input$crime_type_only_one == "rape_sum"){
       plot2 <-
         ggplot(crimeData3, aes(year,rape_per_100k,text=(department_name))) +
-        geom_path(aes(group=department_name, colour=department_name==input$department_name),
+        geom_path(aes(group=department_name, colour=department_name==input$city),
                   se=FALSE,size=0.4)+
         scale_colour_manual("",
-                            labels=c("other",input$department_name),
+                            labels=c("other",input$city),
                             values = c("Grey","Red")
         )+
         theme(legend.position = "none")+
@@ -146,10 +150,10 @@ server <- function(input, output) {
     if (input$crime_type_only_one == "rob_sum"){
       plot2 <-
         ggplot(crimeData3, aes(year,rob_per_100k,text=(department_name))) +
-        geom_path(aes(group=department_name, colour=department_name==input$department_name),
+        geom_path(aes(group=department_name, colour=department_name==input$city),
                   se=FALSE,size=0.4)+
         scale_colour_manual("",
-                            labels=c("other",input$department_name),
+                            labels=c("other",input$city),
                             values = c("Grey","Red")
         )+
         theme(legend.position = "none")+
@@ -162,10 +166,10 @@ server <- function(input, output) {
     if (input$crime_type_only_one == "agg_ass_sum"){
       plot2 <-
         ggplot(crimeData3, aes(year,agg_ass_per_100k,text=(department_name))) +
-        geom_path(aes(group=department_name, colour=department_name==input$department_name),
+        geom_path(aes(group=department_name, colour=department_name==input$city),
                   se=FALSE,size=0.4)+
         scale_colour_manual("",
-                            labels=c("other",input$department_name),
+                            labels=c("other",input$city),
                             values = c("Grey","Red")
         )+
         theme(legend.position = "none")+
