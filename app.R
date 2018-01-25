@@ -40,8 +40,8 @@ ui <- fluidPage( # Application title
                              choices = unique(as.character(crimeData2$department_name)), selected = "Chicago"),
                  hr(),
                  sliderInput("year", "Select Years:",
-                             min = 1975, max = 2015,
-                             value = c(2000,2010)),
+                             min = 1975, max = 2015, step = 1,
+                             value = c(2000,2010), sep = ""),
                  hr(),
                  radioButtons("geom", "Geom", 
                               choices = c("Point" = "geom_point",
@@ -60,14 +60,12 @@ ui <- fluidPage( # Application title
                            #plotlyOutput("theFirstPlot"), plotlyOutput("theThirdPlot"))),
                 
       
-      h4('Violent Crime Rate of Selected Region vs All'),
+      h4('Selected Region in All'),
       plotlyOutput("theFirstPlot"),
       
       h4('Crime Rate of Selected Region'),
-      plotOutput("theSecondPlot"),
+      plotOutput("theSecondPlot")
       
-      h4('Crime Details of Selected Region'),
-      tableOutput("checkboxValue")
     ))
 )
 
@@ -79,14 +77,14 @@ server <- function(input, output) {
   output$theFirstPlot <- renderPlotly({
     
     crimeData3 <- crimeData2 %>%
-      rename("violent_sum" = "violent_crime") %>% 
+      #rename("violent_sum" = "violent_crime") %>% 
       filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) 
     
     
     #plot all and deffrenciate the selected region
     
     
-    
+    if (input$crime_type == "violent_crime"){
     plot2 <-
       ggplot(crimeData3, aes(year,violent_per_100k,text=(department_name))) +
       geom_path(aes(group=department_name, colour=department_name==input$department_name),
@@ -95,12 +93,76 @@ server <- function(input, output) {
                           labels=c("other",input$department_name),
                           values = c("Grey","Red")
       )+
-      theme(legend.position = "none")
+      theme(legend.position = "none")+
+      ggtitle("Violent Crime Rate of Selected Region vs All")
     
     
     
-    plot3 <- ggplotly(plot2,tooltip=c("x","text")) 
+    plot3 <- ggplotly(plot2,tooltip=c("x","text"))}
     
+    if (input$crime_type == "homs_sum"){
+      plot2 <-
+        ggplot(crimeData3, aes(year,homs_per_100k,text=(department_name))) +
+        geom_path(aes(group=department_name, colour=department_name==input$department_name),
+                  se=FALSE,size=0.4)+
+        scale_colour_manual("",
+                            labels=c("other",input$department_name),
+                            values = c("Grey","Red")
+        )+
+        theme(legend.position = "none")+
+        ggtitle("Homicide Crime Rate of Selected Region vs All")
+      
+      
+      
+      plot3 <- ggplotly(plot2,tooltip=c("x","text"))}    
+
+    if (input$crime_type == "rape_sum"){
+      plot2 <-
+        ggplot(crimeData3, aes(year,rape_per_100k,text=(department_name))) +
+        geom_path(aes(group=department_name, colour=department_name==input$department_name),
+                  se=FALSE,size=0.4)+
+        scale_colour_manual("",
+                            labels=c("other",input$department_name),
+                            values = c("Grey","Red")
+        )+
+        theme(legend.position = "none")+
+        ggtitle("Rape Crime Rate of Selected Region vs All")
+      
+      
+      
+      plot3 <- ggplotly(plot2,tooltip=c("x","text"))}            
+    
+    if (input$crime_type == "rob_sum"){
+      plot2 <-
+        ggplot(crimeData3, aes(year,rob_per_100k,text=(department_name))) +
+        geom_path(aes(group=department_name, colour=department_name==input$department_name),
+                  se=FALSE,size=0.4)+
+        scale_colour_manual("",
+                            labels=c("other",input$department_name),
+                            values = c("Grey","Red")
+        )+
+        theme(legend.position = "none")+
+        ggtitle("Robbery Crime Rate of Selected Region vs All")
+      
+      
+      
+      plot3 <- ggplotly(plot2,tooltip=c("x","text"))}      
+    
+    if (input$crime_type == "agg_ass_sum"){
+      plot2 <-
+        ggplot(crimeData3, aes(year,agg_ass_per_100k,text=(department_name))) +
+        geom_path(aes(group=department_name, colour=department_name==input$department_name),
+                  se=FALSE,size=0.4)+
+        scale_colour_manual("",
+                            labels=c("other",input$department_name),
+                            values = c("Grey","Red")
+        )+
+        theme(legend.position = "none")+
+        ggtitle("Aggravated Assault Crime Rate of Selected Region vs All")
+      
+      
+      
+      plot3 <- ggplotly(plot2,tooltip=c("x","text"))} 
     
     plot3
     
@@ -114,7 +176,7 @@ server <- function(input, output) {
     }
     
     crimeData3 <- crimeData2 %>%
-      rename("violent_sum" = "violent_crime") %>%
+      #rename("violent_sum" = "violent_crime") %>%
       filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) %>%
       filter(department_name %in% input$department_name) 
 
@@ -150,29 +212,7 @@ server <- function(input, output) {
       theme(legend.position = "bottom")
     
   })
- 
-  # set up the output table
-  output$checkboxValue <- renderTable({
-    crimeData3 <- crimeData2 %>%
-      rename("violent_sum" = "violent_crime") %>%
-      filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) %>% # according to the slected years
-      filter(department_name %in% input$department_name) 
-    
-    
-    columns <- c()
-    
-    for (ict in 1:length(input$crime_type)) {
-      col <- strsplit(input$crime_type[ict], '_')
-      if (length(col[[1]]) <= 2) {
-        col <- col[[1]][1]
-      } else {
-        col <- paste0(col[[1]][1], '_', col[[1]][2])
-      }
-      columns <- c(columns, paste0(col, '_sum'), paste0(col, '_per_100k')) #output both crime counts and crime rates
-    }
-    
-    crimeData3[, c('year', columns)]
-  })   
+
   
 }
 
