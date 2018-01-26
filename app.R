@@ -71,10 +71,10 @@ ui <- fluidPage( # Application title
                            #plotlyOutput("theFirstPlot"), plotlyOutput("theThirdPlot"))),
                 
       
-      h4('Selected Region in All'),
+      h4('Selected Region vs All'),
       plotlyOutput("theFirstPlot"),
       
-      h4('Crime Rate of Selected Region'),
+      h4('Selected Regions Comparison'),
       plotOutput("theSecondPlot")
       
     ))
@@ -106,7 +106,8 @@ server <- function(input, output) {
                           values = c("Grey","Red")
       )+
       theme(legend.position = "none")+
-      ggtitle("Violent Crime Rate of Selected Region vs All")
+      ggtitle("Violent Crime Rate of Selected Region vs All")+
+      labs(y="Violent Crime per 100k")
     
     
     
@@ -122,7 +123,8 @@ server <- function(input, output) {
                             values = c("Grey","Red")
         )+
         theme(legend.position = "none")+
-        ggtitle("Homicide Crime Rate of Selected Region vs All")
+        ggtitle("Homicide Crime Rate of Selected Region vs All")+
+        labs(y="Homicide Crime per 100k")
       
       
       
@@ -138,7 +140,8 @@ server <- function(input, output) {
                             values = c("Grey","Red")
         )+
         theme(legend.position = "none")+
-        ggtitle("Rape Crime Rate of Selected Region vs All")
+        ggtitle("Rape Crime Rate of Selected Region vs All")+
+        labs(y="Rape Crime per 100k")
       
       
       
@@ -154,7 +157,8 @@ server <- function(input, output) {
                             values = c("Grey","Red")
         )+
         theme(legend.position = "none")+
-        ggtitle("Robbery Crime Rate of Selected Region vs All")
+        ggtitle("Robbery Crime Rate of Selected Region vs All")+
+        labs(y="Robbery Crime per 100k")
       
       
       
@@ -170,7 +174,8 @@ server <- function(input, output) {
                             values = c("Grey","Red")
         )+
         theme(legend.position = "none")+
-        ggtitle("Aggravated Assault Crime Rate of Selected Region vs All")
+        ggtitle("Aggravated Assault Crime Rate of Selected Region vs All") +
+        labs(y="Aggravated Assault Crime per 100k")
       
       
       
@@ -194,7 +199,7 @@ server <- function(input, output) {
 
     
     crimeDataCountPlot <- ggplot(crimeData3)
-    colors <- c('#dd1c77', '#c994c7', '#e7e1ef', '#e6550d', '#fdae6b')
+    #colors <- c('#dd1c77', '#c994c7', '#e7e1ef', '#e6550d', '#fdae6b')
     for (ict in 1:length(input$crime_type)) {
       col <- strsplit(input$crime_type[ict], '_')
       
@@ -211,18 +216,21 @@ server <- function(input, output) {
         crimeDataCountPlot <- 
           crimeDataCountPlot + 
           geom_point(aes_string('year', y, color = shQuote(y)),size = 2, alpha = input$alpha) +
-          facet_wrap(~ input$department_name)
+          facet_wrap(~ input$department_name) +
+          labs(y="crime rate")
       }else if (input$geom == "geom_smooth"){
         crimeDataCountPlot <- 
           crimeDataCountPlot + 
           geom_smooth(aes_string('year', y, color = shQuote(y)),size = 2, alpha = input$alpha, se = FALSE )+
-          facet_wrap(~ input$department_name)
+          facet_wrap(~ input$department_name) +
+          labs(y="crime rate")
         }
       
 
     }
     
     crimeDataCountPlot + 
+      scale_color_brewer(palette = "Set2")+
       theme(legend.position = "bottom") 
   })
 
