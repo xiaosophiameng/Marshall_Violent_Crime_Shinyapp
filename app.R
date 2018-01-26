@@ -105,9 +105,11 @@ server <- function(input, output) {
                           labels=c("other",input$city),
                           values = c("Grey","Red")
       )+
+      theme_bw()+
       theme(legend.position = "none")+
       ggtitle("Violent Crime Rate of Selected Region vs All")+
-      labs(y="Violent Crime per 100k")
+      labs(y="Violent Crime per 100k")+
+      theme(plot.title = element_text(hjust=0.5))
     
     
     
@@ -122,9 +124,11 @@ server <- function(input, output) {
                             labels=c("other",input$city),
                             values = c("Grey","Red")
         )+
+        theme_bw()+
         theme(legend.position = "none")+
         ggtitle("Homicide Crime Rate of Selected Region vs All")+
-        labs(y="Homicide Crime per 100k")
+        labs(y="Homicide Crime per 100k")+
+        theme(plot.title = element_text(hjust=0.5))
       
       
       
@@ -139,9 +143,11 @@ server <- function(input, output) {
                             labels=c("other",input$city),
                             values = c("Grey","Red")
         )+
+        theme_bw()+
         theme(legend.position = "none")+
         ggtitle("Rape Crime Rate of Selected Region vs All")+
-        labs(y="Rape Crime per 100k")
+        labs(y="Rape Crime per 100k")+
+        theme(plot.title = element_text(hjust=0.5))
       
       
       
@@ -156,9 +162,11 @@ server <- function(input, output) {
                             labels=c("other",input$city),
                             values = c("Grey","Red")
         )+
+        theme_bw()+
         theme(legend.position = "none")+
         ggtitle("Robbery Crime Rate of Selected Region vs All")+
-        labs(y="Robbery Crime per 100k")
+        labs(y="Robbery Crime per 100k")+
+        theme(plot.title = element_text(hjust=0.5))
       
       
       
@@ -173,9 +181,12 @@ server <- function(input, output) {
                             labels=c("other",input$city),
                             values = c("Grey","Red")
         )+
+        theme_bw()+
         theme(legend.position = "none")+
         ggtitle("Aggravated Assault Crime Rate of Selected Region vs All") +
-        labs(y="Aggravated Assault Crime per 100k")
+        labs(y="Aggravated Assault Crime per 100k")+
+        theme(plot.title = element_text(hjust=0.5))
+        
       
       
       
@@ -216,14 +227,13 @@ server <- function(input, output) {
         crimeDataCountPlot <- 
           crimeDataCountPlot + 
           geom_point(aes_string('year', y, color = shQuote(y)),size = 2, alpha = input$alpha) +
-          facet_wrap(~ input$department_name) +
-          labs(y="crime rate")
+          facet_wrap(~ input$department_name) 
+          
       }else if (input$geom == "geom_smooth"){
         crimeDataCountPlot <- 
           crimeDataCountPlot + 
-          geom_smooth(aes_string('year', y, color = shQuote(y)),size = 2, alpha = input$alpha, se = FALSE )+
-          facet_wrap(~ input$department_name) +
-          labs(y="crime rate")
+          geom_smooth(aes_string('year', y, color = shQuote(y)),size = 0.8, alpha = input$alpha, se = FALSE )+
+          facet_wrap(~ input$department_name)
         }
       
 
@@ -231,7 +241,12 @@ server <- function(input, output) {
     
     crimeDataCountPlot + 
       scale_color_brewer(palette = "Set2")+
-      theme(legend.position = "bottom") 
+      theme_bw()+
+      theme(legend.position = "bottom") +
+      labs(y="crime rate")+
+      ggtitle("Crime rates in selected regions")+
+      theme(plot.title = element_text(hjust=0.5,face = "bold"),
+            axis.title=element_text(size=12,face = "bold"))
   })
 
   
