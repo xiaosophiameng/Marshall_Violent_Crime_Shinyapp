@@ -7,6 +7,7 @@ library(magrittr)
 library(colourpicker)
 library(lubridate)
 library(plotly)
+library(viridis)
 
 # read data and initial data wrangling
 
@@ -193,7 +194,7 @@ server <- function(input, output) {
 
     
     crimeDataCountPlot <- ggplot(crimeData3)
-    colors <- c('red', 'blue', 'green', 'yellow', 'cyan')
+    colors <- c('#dd1c77', '#c994c7', '#e7e1ef', '#e6550d', '#fdae6b')
     for (ict in 1:length(input$crime_type)) {
       col <- strsplit(input$crime_type[ict], '_')
       
@@ -214,20 +215,15 @@ server <- function(input, output) {
       }else if (input$geom == "geom_smooth"){
         crimeDataCountPlot <- 
           crimeDataCountPlot + 
-          geom_smooth(aes_string('year', y, color = shQuote(y)),size = 2, alpha = input$alpha)+
+          geom_smooth(aes_string('year', y, color = shQuote(y)),size = 2, alpha = input$alpha, se = FALSE )+
           facet_wrap(~ input$department_name)
         }
       
 
     }
     
-    crimeDataCountPlot + scale_color_manual("crime type", values=c(violent_per_100k=colors[1],
-                                                                   homs_per_100k=colors[2],
-                                                                   rape_per_100k=colors[3],
-                                                                   rob_per_100k=colors[4],
-                                                                   agg_ass_per_100k=colors[5]))+
-      theme(legend.position = "bottom")
-    
+    crimeDataCountPlot + 
+      theme(legend.position = "bottom") 
   })
 
   
