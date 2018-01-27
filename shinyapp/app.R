@@ -30,6 +30,7 @@ ui <- fluidPage( # Application title
                  sliderInput("year", "Select Years:",
                              min = 1975, max = 2015, step = 1,
                              value = c(2000,2010), sep = ""),
+                 hr(),
                  h4("Inputs for Figure 1:"),
                  radioButtons("crime_type_only_one",
                               label = "Select Crime Type:",
