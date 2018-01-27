@@ -26,12 +26,13 @@ ui <- fluidPage( # Application title
   # Sidebar with a slider input for number of bins
   sidebarLayout(
     sidebarPanel(width = 3,
-
+                #select year range
                  sliderInput("year", "Select Years:",
                              min = 1975, max = 2015, step = 1,
                              value = c(2000,2010), sep = ""),
                  hr(),
                  h4("Inputs for Figure 1:"),
+                #select crime type
                  radioButtons("crime_type_only_one",
                               label = "Select Crime Type:",
                               choices = c("Total Violent" = "violent_crime",
@@ -40,11 +41,13 @@ ui <- fluidPage( # Application title
                                           "Robbery" = "rob_sum",
                                           "Aggravated Assault" = "agg_ass_sum"),
                               selected = "violent_crime"),
+                #select region
                  selectInput("city", "Select Region:", multiple = FALSE,
                              #choices = unique(as.character(crimeData2$department_name)), 
                              sort(unique(crimeData2$department_name)),selected = "Chicago"),
                  hr(),
                  h4("Inputs for Figure 2:"),
+                #select crime type
                  checkboxGroupInput("crime_type",
                                     "Select Crime Type (multiple selections allowed):",
                                     choices = c("Total Violent" = "violent_crime",
@@ -53,13 +56,16 @@ ui <- fluidPage( # Application title
                                                 "Robbery" = "rob_sum",
                                                 "Aggravated Assault" = "agg_ass_sum"),
                                     selected = "violent_crime"),
+                #select region
                  selectInput("department_name", "Select Region (multiple selections allowed):", multiple = TRUE,
                              #choices = unique(as.character(crimeData2$department_name)), 
                              sort(unique(crimeData2$department_name)),selected = "Chicago"),
+                #select plot type
                  radioButtons("geom", "Geom", 
                               choices = c("Point" = "geom_point",
                                           "Smooth" = "geom_smooth"), 
                               selected = "geom_smooth"),
+                #select transparency
                  numericInput("alpha", "Choose transparency for point:",
                               min = 0, max = 1,
                               value = 0.7, step = 0.1)
@@ -67,16 +73,12 @@ ui <- fluidPage( # Application title
     
     # Show a plot of the generated distribution
     mainPanel(
-      #h4('Violent Crime Rate of Selected Region vs All'),
-      #fluidRow(splitLayout(cellWidths = c("50%", "50%"),
-                           #plotlyOutput("theFirstPlot"), plotlyOutput("theThirdPlot"))),
                 
-      
       h4('Selected Region vs All'),
-      plotlyOutput("theFirstPlot"),
+      plotlyOutput("oneRegionandAllPlot"),
       
       h4('Selected Regions Comparison'),
-      plotOutput("theSecondPlot")
+      plotOutput("RegionsComparisonPlot")
       
     ))
 )
@@ -86,19 +88,18 @@ ui <- fluidPage( # Application title
 server <- function(input, output) {
   
   # set up the first plot
-  output$theFirstPlot <- renderPlotly({
+  output$oneRegionandAllPlot <- renderPlotly({
     
     crimeData3 <- crimeData2 %>%
-      #rename("violent_sum" = "violent_crime") %>% 
       filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) 
       
     
     
     #plot all and deffrenciate the selected region
     
-    
+    #when users select violent_crime
     if (input$crime_type_only_one == "violent_crime"){
-    plot2 <-
+    comparison_plot <-
       ggplot(crimeData3, aes(year,round(violent_per_100k),text=(department_name))) +
       geom_path(aes(group=department_name, colour=department_name==input$city),
                 se=FALSE,size=0.4)+
@@ -113,11 +114,12 @@ server <- function(input, output) {
       theme(plot.title = element_text(hjust=0.5))
     
     
+    # add tooltip
+    tooltip_comparison_plot <- ggplotly(comparison_plot,tooltip=c("x","text","y"))}
     
-    plot3 <- ggplotly(plot2,tooltip=c("x","text","y"))}
-    
+    #when users select homs_sum
     if (input$crime_type_only_one == "homs_sum"){
-      plot2 <-
+      comparison_plot <-
         ggplot(crimeData3, aes(year,round(homs_per_100k),text=(department_name))) +
         geom_path(aes(group=department_name, colour=department_name==input$city),
                   se=FALSE,size=0.4)+
@@ -132,11 +134,12 @@ server <- function(input, output) {
         theme(plot.title = element_text(hjust=0.5))
       
       
-      
-      plot3 <- ggplotly(plot2,tooltip=c("x","text","y"))}    
-
+      # add tooltip 
+      tooltip_comparison_plot <- ggplotly(comparison_plot,tooltip=c("x","text","y"))}    
+    
+    #when users select rape_sum
     if (input$crime_type_only_one == "rape_sum"){
-      plot2 <-
+      comparison_plot <-
         ggplot(crimeData3, aes(year,round(rape_per_100k),text=(department_name))) +
         geom_path(aes(group=department_name, colour=department_name==input$city),
                   se=FALSE,size=0.4)+
@@ -151,11 +154,12 @@ server <- function(input, output) {
         theme(plot.title = element_text(hjust=0.5))
       
       
-      
-      plot3 <- ggplotly(plot2,tooltip=c("x","text","y"))}            
+      # add tooltip
+      tooltip_comparison_plot <- ggplotly(comparison_plot,tooltip=c("x","text","y"))}            
     
+    #when users select rob_sum
     if (input$crime_type_only_one == "rob_sum"){
-      plot2 <-
+      comparison_plot <-
         ggplot(crimeData3, aes(year,round(rob_per_100k),text=(department_name))) +
         geom_path(aes(group=department_name, colour=department_name==input$city),
                   se=FALSE,size=0.4)+
@@ -170,11 +174,12 @@ server <- function(input, output) {
         theme(plot.title = element_text(hjust=0.5))
       
       
-      
-      plot3 <- ggplotly(plot2,tooltip=c("x","text","y"))}      
+      # add tooltip
+      tooltip_comparison_plot <- ggplotly(comparison_plot,tooltip=c("x","text","y"))}      
     
+    #when users select agg_ass_sum
     if (input$crime_type_only_one == "agg_ass_sum"){
-      plot2 <-
+      comparison_plot <-
         ggplot(crimeData3, aes(year,round(agg_ass_per_100k),text=(department_name))) +
         geom_path(aes(group=department_name, colour=department_name==input$city),
                   se=FALSE,size=0.4)+
@@ -190,11 +195,11 @@ server <- function(input, output) {
         
       
       
-      
-      plot3 <- ggplotly(plot2,tooltip=c("x","text","y"))} 
+      # add tooltip
+      tooltip_comparison_plot <- ggplotly(comparison_plot,tooltip=c("x","text","y"))} 
 
     
-    plot3
+    tooltip_comparison_plot
     
 
     
@@ -202,20 +207,18 @@ server <- function(input, output) {
   })
   
   # set up the second output plot
-  output$theSecondPlot <- renderPlot({
+  output$RegionsComparisonPlot<- renderPlot({
     
     if (is.null(input$department_name)){
       return(NULL)
     }
     
     crimeData3 <- crimeData2 %>%
-      #rename("violent_sum" = "violent_crime") %>%
       filter(year >= as.numeric(input$year[1]) & year <= as.numeric(input$year[2])) %>%
       filter(department_name %in% input$department_name) 
 
-    
+   #get y-axis 
     crimeDataCountPlot <- ggplot(crimeData3)
-    #colors <- c('#dd1c77', '#c994c7', '#e7e1ef', '#e6550d', '#fdae6b')
     for (ict in 1:length(input$crime_type)) {
       col <- strsplit(input$crime_type[ict], '_')
       
@@ -227,13 +230,13 @@ server <- function(input, output) {
       y <- paste0(col, '_per_100k') #output crime rates
       title <- paste0('Rate of ', col, ' crime')
       
-
+      #when users choose scatter plot
       if(input$geom == "geom_point"){
         crimeDataCountPlot <- 
           crimeDataCountPlot + 
           geom_point(aes_string('year', y, color = shQuote(y)),size = 2, alpha = input$alpha) +
           facet_wrap(~ input$department_name) 
-          
+      #when users choose smooth line plot   
       }else if (input$geom == "geom_smooth"){
         crimeDataCountPlot <- 
           crimeDataCountPlot + 
@@ -244,6 +247,7 @@ server <- function(input, output) {
 
     }
     
+    # add colorblind-friendly colors
     crimeDataCountPlot + 
       scale_color_brewer(palette = "Set2")+
       theme_bw()+
