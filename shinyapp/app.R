@@ -61,7 +61,7 @@ ui <- fluidPage( # Application title
                               selected = "geom_smooth"),
                  numericInput("alpha", "Choose transparency for point:",
                               min = 0, max = 1,
-                              value = 0.5, step = 0.1)
+                              value = 0.7, step = 0.1)
     ),
     
     # Show a plot of the generated distribution
@@ -98,7 +98,7 @@ server <- function(input, output) {
     
     if (input$crime_type_only_one == "violent_crime"){
     plot2 <-
-      ggplot(crimeData3, aes(year,violent_per_100k,text=(department_name))) +
+      ggplot(crimeData3, aes(year,round(violent_per_100k),text=(department_name))) +
       geom_path(aes(group=department_name, colour=department_name==input$city),
                 se=FALSE,size=0.4)+
       scale_colour_manual("",
@@ -113,11 +113,11 @@ server <- function(input, output) {
     
     
     
-    plot3 <- ggplotly(plot2,tooltip=c("x","text"))}
+    plot3 <- ggplotly(plot2,tooltip=c("x","text","y"))}
     
     if (input$crime_type_only_one == "homs_sum"){
       plot2 <-
-        ggplot(crimeData3, aes(year,homs_per_100k,text=(department_name))) +
+        ggplot(crimeData3, aes(year,round(homs_per_100k),text=(department_name))) +
         geom_path(aes(group=department_name, colour=department_name==input$city),
                   se=FALSE,size=0.4)+
         scale_colour_manual("",
@@ -132,11 +132,11 @@ server <- function(input, output) {
       
       
       
-      plot3 <- ggplotly(plot2,tooltip=c("x","text"))}    
+      plot3 <- ggplotly(plot2,tooltip=c("x","text","y"))}    
 
     if (input$crime_type_only_one == "rape_sum"){
       plot2 <-
-        ggplot(crimeData3, aes(year,rape_per_100k,text=(department_name))) +
+        ggplot(crimeData3, aes(year,round(rape_per_100k),text=(department_name))) +
         geom_path(aes(group=department_name, colour=department_name==input$city),
                   se=FALSE,size=0.4)+
         scale_colour_manual("",
@@ -151,11 +151,11 @@ server <- function(input, output) {
       
       
       
-      plot3 <- ggplotly(plot2,tooltip=c("x","text"))}            
+      plot3 <- ggplotly(plot2,tooltip=c("x","text","y"))}            
     
     if (input$crime_type_only_one == "rob_sum"){
       plot2 <-
-        ggplot(crimeData3, aes(year,rob_per_100k,text=(department_name))) +
+        ggplot(crimeData3, aes(year,round(rob_per_100k),text=(department_name))) +
         geom_path(aes(group=department_name, colour=department_name==input$city),
                   se=FALSE,size=0.4)+
         scale_colour_manual("",
@@ -170,11 +170,11 @@ server <- function(input, output) {
       
       
       
-      plot3 <- ggplotly(plot2,tooltip=c("x","text"))}      
+      plot3 <- ggplotly(plot2,tooltip=c("x","text","y"))}      
     
     if (input$crime_type_only_one == "agg_ass_sum"){
       plot2 <-
-        ggplot(crimeData3, aes(year,agg_ass_per_100k,text=(department_name))) +
+        ggplot(crimeData3, aes(year,round(agg_ass_per_100k),text=(department_name))) +
         geom_path(aes(group=department_name, colour=department_name==input$city),
                   se=FALSE,size=0.4)+
         scale_colour_manual("",
@@ -190,9 +190,13 @@ server <- function(input, output) {
       
       
       
-      plot3 <- ggplotly(plot2,tooltip=c("x","text"))} 
+      plot3 <- ggplotly(plot2,tooltip=c("x","text","y"))} 
+
     
     plot3
+    
+
+    
     
   })
   
@@ -249,7 +253,6 @@ server <- function(input, output) {
             axis.title=element_text(size=12,face = "bold"))
   })
 
-  
 }
 
 #launch the app
