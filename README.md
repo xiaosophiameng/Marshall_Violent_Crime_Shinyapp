@@ -1,5 +1,11 @@
 # Sophiashinyapp
 
+## Source 
+
+[R code](https://github.com/xiaosophiameng/Sophiashinyapp/blob/master/shinyapp/app.R)
+
+[Data used](https://github.com/xiaosophiameng/Sophiashinyapp/blob/master/shinyapp/ucr_crime_1975_2015.csv)
+
 ## Overview
 
 Whether the crime in the US is increasing or decreasing and which regions have more crimes have been hot topics for long. To answer these questions, I propose setting up a data  visualization app that enables people who are interested to explore the dataset of Marshall Violent Crime and visualize the results. My app will display the distributions of total crimes and different crime types in terms of years and regions in order to get the trend of crimes and compare crimes in different places within the US. 
